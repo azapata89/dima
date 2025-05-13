@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión - Mamografía e Imágenes Diagnósticas</title>
+    <!-- Importar Vue desde CDN -->
+    <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.prod.js"></script>
+    <style>
+        :root {
+            --primary-green: #8BA757;
+            --primary-green-light: #a5bd77;
+            --primary-green-dark: #6e8842;
+            --accent-yellow: #F9C74F;
+            --accent-yellow-light: #fad477;
+            --accent-yellow-dark: #f5b422;
+            --light-gray: #f4f4f4;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #333333;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 20px 20px;
+            border-bottom: 1px solid var(--primary-green-light);
+        }
+        
+        .logo {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo-text {
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+        
+        .nav-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--primary-green-dark);
+        }
+        
+        .nav-item.active {
+            background-color: var(--accent-yellow);
+            color: var(--dark-gray);
+            border-left: 4px solid var(--accent-yellow-dark);
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .page-title {
+            font-size: 24px;
+            color: var(--primary-green-dark);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Card and Table Styles */
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 15px 20px;
+            background-color: var(--primary-green-light);
+            color: var(--white);
+            font-weight: bold;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background-color: var(--light-gray);
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-green);
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        tr:hover {
+            background-color: var(--light-gray);
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 2px rgba(139, 167, 87, 0.2);
+        }
+        
+        /* Button Styles */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-green-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--accent-yellow);
+            color: var(--dark-gray);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--accent-yellow-dark);
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: var(--white);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-icon {
+            padding: 6px;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+        
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 500px;
+            max-width: 90%;
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            font-weight: bold;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header .close {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid var(--medium-gray);
+        }
+        
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
+        }
+        
+        .flex {
+            display: flex;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .gap-2 {
+            gap: 10px;
+        }
+        
+        .mb-4 {
+            margin-bottom: 20px;
+        }
+        
+        /* Form grid */
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-col {
+            flex: 1;
+        }
+        
+        /* Icon library (simplified) */
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background-position: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="logo-container">
+                <div class="logo-text">Mamografía e Imágenes Diagnósticas</div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item" :class="{ active: currentModule === 'usuarios' }" @click="setCurrentModule('usuarios')">
+                    <span>👤</span> Usuarios
+                </li>
+                <li class="nav-item" :class="{ active: currentModule === 'equipos' }" @click="setCurrentModule('equipos')">
+                    <span>🔬</span> Equipos
+                </li>
+                <li class="nav-item" :class="{ active: currentModule === 'inventario' }" @click="setCurrentModule('inventario')">
+                    <span>📦</span> Inventario
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Usuarios Module -->
+            <div v-if="currentModule === 'usuarios'">
+                <div class="header">
+                    <h1 class="page-title">Gestión de Usuarios</h1>
+                    <div class="actions">
+                        <button class="btn btn-primary" @click="openModal('usuarios')">Agregar Usuario</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Correo</th>
+                                    <th>Rol</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="usuario in usuarios" :key="usuario.id">
+                                    <td>{{ usuario.id }}</td>
+                                    <td>{{ usuario.nombre }}</td>
+                                    <td>{{ usuario.correo }}</td>
+                                    <td>{{ usuario.rol }}</td>
+                                    <td>
+                                        <button class="btn btn-secondary btn-icon" @click="editItem('usuarios', usuario)">✏️</button>
+                                        <button class="btn btn-danger btn-icon" @click="deleteItem('usuarios', usuario.id)">🗑️</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equipos Module -->
+            <div v-if="currentModule === 'equipos'">
+                <div class="header">
+                    <h1 class="page-title">Gestión de Equipos</h1>
+                    <div class="actions">
+                        <button class="btn btn-primary" @click="openModal('equipos')">Agregar Equipo</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Modelo</th>
+                                    <th>Fabricante</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="equipo in equipos" :key="equipo.id">
+                                    <td>{{ equipo.id }}</td>
+                                    <td>{{ equipo.nombre }}</td>
+                                    <td>{{ equipo.modelo }}</td>
+                                    <td>{{ equipo.fabricante }}</td>
+                                    <td>{{ equipo.estado }}</td>
+                                    <td>
+                                        <button class="btn btn-secondary btn-icon" @click="editItem('equipos', equipo)">✏️</button>
+                                        <button class="btn btn-danger btn-icon" @click="deleteItem('equipos', equipo.id)">🗑️</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventario Module -->
+            <div v-if="currentModule === 'inventario'">
+                <div class="header">
+                    <h1 class="page-title">Gestión de Inventario</h1>
+                    <div class="actions">
+                        <button class="btn btn-primary" @click="openModal('inventario')">Agregar Item</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Cantidad</th>
+                                    <th>Último Ingreso</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in inventario" :key="item.id">
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.nombre }}</td>
+                                    <td>{{ item.categoria }}</td>
+                                    <td>{{ item.cantidad }}</td>
+                                    <td>{{ item.fecha_ingreso }}</td>
+                                    <td>
+                                        <button class="btn btn-secondary btn-icon" @click="editItem('inventario', item)">✏️</button>
+                                        <button class="btn btn-danger btn-icon" @click="deleteItem('inventario', item.id)">🗑️</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for CRUD operations -->
+            <div class="modal-backdrop" v-if="showModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>{{ editMode ? 'Editar' : 'Agregar' }} {{ getModuleTitle() }}</h3>
+                        <button class="close" @click="closeModal">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Usuarios Form -->
+                        <form v-if="currentModule === 'usuarios'" @submit.prevent="saveItem">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="nombre">Nombre Completo</label>
+                                        <input type="text" id="nombre" v-model="formData.nombre" required>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="correo">Correo Electrónico</label>
+                                        <input type="email" id="correo" v-model="formData.correo" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="rol">Rol</label>
+                                        <select id="rol" v-model="formData.rol" required>
+                                            <option value="Administrador">Administrador</option>
+                                            <option value="Médico">Médico</option>
+                                            <option value="Técnico">Técnico</option>
+                                            <option value="Recepcionista">Recepcionista</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="password">Contraseña</label>
+                                        <input type="password" id="password" v-model="formData.password" :required="!editMode">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <!-- Equipos Form -->
+                        <form v-if="currentModule === 'equipos'" @submit.prevent="saveItem">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="nombre">Nombre del Equipo</label>
+                                        <input type="text" id="nombre" v-model="formData.nombre" required>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="modelo">Modelo</label>
+                                        <input type="text" id="modelo" v-model="formData.modelo" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="fabricante">Fabricante</label>
+                                        <input type="text" id="fabricante" v-model="formData.fabricante" required>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="estado">Estado</label>
+                                        <select id="estado" v-model="formData.estado" required>
+                                            <option value="Activo">Activo</option>
+                                            <option value="En mantenimiento">En mantenimiento</option>
+                                            <option value="Fuera de servicio">Fuera de servicio</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="descripcion">Descripción</label>
+                                <textarea id="descripcion" v-model="formData.descripcion" rows="3"></textarea>
+                            </div>
+                        </form>
+                        
+                        <!-- Inventario Form -->
+                        <form v-if="currentModule === 'inventario'" @submit.prevent="saveItem">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="nombre">Nombre del Item</label>
+                                        <input type="text" id="nombre" v-model="formData.nombre" required>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="categoria">Categoría</label>
+                                        <select id="categoria" v-model="formData.categoria" required>
+                                            <option value="Consumibles">Consumibles</option>
+                                            <option value="Repuestos">Repuestos</option>
+                                            <option value="Medicamentos">Medicamentos</option>
+                                            <option value="Materiales">Materiales</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="cantidad">Cantidad</label>
+                                        <input type="number" id="cantidad" v-model="formData.cantidad" min="0" required>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="fecha_ingreso">Fecha de Ingreso</label>
+                                        <input type="date" id="fecha_ingreso" v-model="formData.fecha_ingreso" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="observaciones">Observaciones</label>
+                                <textarea id="observaciones" v-model="formData.observaciones" rows="2"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @click="closeModal">Cancelar</button>
+                        <button class="btn btn-primary" @click="saveItem">{{ editMode ? 'Actualizar' : 'Guardar' }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Esperar a que Vue esté disponible
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar que Vue esté disponible
+            if (typeof Vue === 'undefined') {
+                console.error('Vue no está disponible');
+                return;
+            }
+            
+            const app = Vue.createApp({
+                data() {
+                    return {
+                        currentModule: 'usuarios',
+                        showModal: false,
+                        editMode: false,
+                        formData: {},
+                        selectedItemId: null,
+                        
+                        // Data storage
+                        usuarios: [
+                            { id: 1, nombre: 'Juan Pérez', correo: 'juan.perez@clinica.co', rol: 'Médico' },
+                            { id: 2, nombre: 'Ana Gómez', correo: 'ana.gomez@clinica.co', rol: 'Técnico' },
+                            { id: 3, nombre: 'Carlos Rodriguez', correo: 'carlos.rodriguez@clinica.co', rol: 'Administrador' }
+                        ],
+                        
+                        equipos: [
+                            { id: 1, nombre: 'Mamógrafo Digital', modelo: 'MD-5000', fabricante: 'Medical Solutions', estado: 'Activo', descripcion: 'Equipo de última generación para mamografías digitales.' },
+                            { id: 2, nombre: 'Ecógrafo Portátil', modelo: 'Echo-P200', fabricante: 'SonoTech', estado: 'En mantenimiento', descripcion: 'Equipo portátil para ecografías diagnósticas.' }
+                        ],
+                        
+                        inventario: [
+                            { id: 1, nombre: 'Gel conductor', categoria: 'Consumibles', cantidad: 50, fecha_ingreso: '2025-04-15', observaciones: 'Cajas de 500ml' },
+                            { id: 2, nombre: 'Placas radiográficas', categoria: 'Consumibles', cantidad: 200, fecha_ingreso: '2025-04-10', observaciones: 'Formato 35x43cm' },
+                            { id: 3, nombre: 'Kit de calibración', categoria: 'Repuestos', cantidad: 5, fecha_ingreso: '2025-03-25', observaciones: 'Para mamógrafo MD-5000' }
+                        ]
+                    };
+                },
+                
+                methods: {
+                    setCurrentModule(module) {
+                        this.currentModule = module;
+                    },
+                    
+                    getModuleTitle() {
+                        const titles = {
+                            'usuarios': 'Usuario',
+                            'equipos': 'Equipo',
+                            'inventario': 'Item de Inventario'
+                        };
+                        return titles[this.currentModule];
+                    },
+                    
+                    openModal(module) {
+                        this.currentModule = module;
+                        this.editMode = false;
+                        this.resetForm();
+                        this.showModal = true;
+                    },
+                    
+                    closeModal() {
+                        this.showModal = false;
+                        this.resetForm();
+                    },
+                    
+                    resetForm() {
+                        this.formData = {};
+                        this.selectedItemId = null;
+                        
+                        // Set default values based on the module
+                        if (this.currentModule === 'usuarios') {
+                            this.formData.rol = 'Médico';
+                        } else if (this.currentModule === 'equipos') {
+                            this.formData.estado = 'Activo';
+                        } else if (this.currentModule === 'inventario') {
+                            this.formData.categoria = 'Consumibles';
+                            this.formData.cantidad = 1;
+                            this.formData.fecha_ingreso = new Date().toISOString().split('T')[0];
+                        }
+                    },
+                    
+                    editItem(module, item) {
+                        this.currentModule = module;
+                        this.editMode = true;
+                        this.selectedItemId = item.id;
+                        
+                        // Clone the item to prevent reactive mutation
+                        this.formData = JSON.parse(JSON.stringify(item));
+                        this.showModal = true;
+                    },
+                    
+                    deleteItem(module, id) {
+                        if (!confirm('¿Está seguro de eliminar este elemento?')) return;
+                        
+                        let collection;
+                        if (module === 'usuarios') {
+                            collection = this.usuarios;
+                        } else if (module === 'equipos') {
+                            collection = this.equipos;
+                        } else {
+                            collection = this.inventario;
+                        }
+                        
+                        const index = collection.findIndex(item => item.id === id);
+                        if (index !== -1) {
+                            collection.splice(index, 1);
+                        }
+                    },
+                    
+                    saveItem() {
+                        let collection;
+                        if (this.currentModule === 'usuarios') {
+                            collection = this.usuarios;
+                        } else if (this.currentModule === 'equipos') {
+                            collection = this.equipos;
+                        } else {
+                            collection = this.inventario;
+                        }
+                        
+                        if (this.editMode) {
+                            // Update existing item
+                            const index = collection.findIndex(item => item.id === this.selectedItemId);
+                            if (index !== -1) {
+                                // Preserve the id and update other properties
+                                const id = collection[index].id;
+                                collection[index] = { ...this.formData, id };
+                            }
+                        } else {
+                            // Add new item
+                            const newId = collection.length > 0 ? 
+                                        Math.max(...collection.map(item => item.id)) + 1 : 1;
+                            
+                            collection.push({ id: newId, ...this.formData });
+                        }
+                        
+                        this.closeModal();
+                    }
+                }
+            });
+            
+            // Montar la aplicación
+            app.mount('#app');
+        });
+    </script>
+</body>
+</html>
