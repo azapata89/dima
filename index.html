@@ -1,775 +1,1685 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión - Mamografía e Imágenes Diagnósticas</title>
-    <!-- Importar Vue desde CDN -->
-    <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.prod.js"></script>
-    <style>
-        :root {
-            --primary-green: #8BA757;
-            --primary-green-light: #a5bd77;
-            --primary-green-dark: #6e8842;
-            --accent-yellow: #F9C74F;
-            --accent-yellow-light: #fad477;
-            --accent-yellow-dark: #f5b422;
-            --light-gray: #f4f4f4;
-            --medium-gray: #e0e0e0;
-            --dark-gray: #333333;
-            --white: #ffffff;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIMA - Sistema de Gestión para Clínica de Imágenes</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: '#2563eb',
+              dark: '#1e40af',
+              light: '#60a5fa'
+            },
+            secondary: {
+              DEFAULT: '#64748b',
+              dark: '#334155',
+              light: '#94a3b8'
+            },
+          }
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: var(--light-gray);
-            color: var(--dark-gray);
-        }
-        
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        /* Sidebar styles */
-        .sidebar {
-            width: 250px;
-            background-color: var(--primary-green);
-            color: var(--white);
-            padding-top: 20px;
-            transition: all 0.3s;
-        }
-        
-        .logo-container {
-            display: flex;
-            align-items: center;
-            padding: 0 20px 20px 20px;
-            border-bottom: 1px solid var(--primary-green-light);
-        }
-        
-        .logo {
-            height: 40px;
-            margin-right: 10px;
-        }
-        
-        .logo-text {
-            font-size: 16px;
-            font-weight: bold;
-            line-height: 1.2;
-        }
-        
-        .nav-menu {
-            list-style: none;
-            padding: 20px 0;
-        }
-        
-        .nav-item {
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: flex;
-            align-items: center;
-        }
-        
-        .nav-item:hover {
-            background-color: var(--primary-green-dark);
-        }
-        
-        .nav-item.active {
-            background-color: var(--accent-yellow);
-            color: var(--dark-gray);
-            border-left: 4px solid var(--accent-yellow-dark);
-        }
-        
-        .nav-item i {
-            margin-right: 10px;
-            font-size: 18px;
-        }
-        
-        /* Main content area */
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--medium-gray);
-        }
-        
-        .page-title {
-            font-size: 24px;
-            color: var(--primary-green-dark);
-        }
-        
-        .actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        /* Card and Table Styles */
-        .card {
-            background-color: var(--white);
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-        
-        .card-header {
-            padding: 15px 20px;
-            background-color: var(--primary-green-light);
-            color: var(--white);
-            font-weight: bold;
-        }
-        
-        .card-body {
-            padding: 20px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        th {
-            background-color: var(--light-gray);
-            padding: 12px 15px;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid var(--primary-green);
-        }
-        
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--medium-gray);
-        }
-        
-        tr:hover {
-            background-color: var(--light-gray);
-        }
-        
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="number"],
-        input[type="date"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--medium-gray);
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary-green);
-            box-shadow: 0 0 0 2px rgba(139, 167, 87, 0.2);
-        }
-        
-        /* Button Styles */
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-green);
-            color: var(--white);
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-green-dark);
-        }
-        
-        .btn-secondary {
-            background-color: var(--accent-yellow);
-            color: var(--dark-gray);
-        }
-        
-        .btn-secondary:hover {
-            background-color: var(--accent-yellow-dark);
-        }
-        
-        .btn-danger {
-            background-color: #e74c3c;
-            color: var(--white);
-        }
-        
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-        
-        .btn-icon {
-            padding: 6px;
-            border-radius: 4px;
-            margin-right: 5px;
-        }
-        
-        /* Modal Styles */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        
-        .modal {
-            background-color: var(--white);
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 500px;
-            max-width: 90%;
-        }
-        
-        .modal-header {
-            padding: 15px 20px;
-            background-color: var(--primary-green);
-            color: var(--white);
-            font-weight: bold;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-header .close {
-            background: none;
-            border: none;
-            color: var(--white);
-            font-size: 20px;
-            cursor: pointer;
-        }
-        
-        .modal-body {
-            padding: 20px;
-        }
-        
-        .modal-footer {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            border-top: 1px solid var(--medium-gray);
-        }
-        
-        /* Utility Classes */
-        .text-center {
-            text-align: center;
-        }
-        
-        .flex {
-            display: flex;
-        }
-        
-        .justify-between {
-            justify-content: space-between;
-        }
-        
-        .items-center {
-            align-items: center;
-        }
-        
-        .gap-2 {
-            gap: 10px;
-        }
-        
-        .mb-4 {
-            margin-bottom: 20px;
-        }
-        
-        /* Form grid */
-        .form-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .form-col {
-            flex: 1;
-        }
-        
-        /* Icon library (simplified) */
-        .icon {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            background-position: center;
-            background-size: contain;
-            background-repeat: no-repeat;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                width: 100%;
-                height: auto;
-            }
-            
-            .form-row {
-                flex-direction: column;
-            }
-        }
-    </style>
+      }
+    }
+  </script>
+  <style>
+    [v-cloak] { display: none; }
+    .sidebar-active {
+      background-color: rgba(37, 99, 235, 0.1);
+      border-left: 4px solid #2563eb;
+    }
+    .fade-enter-active, .fade-leave-active {
+      transition: opacity 0.3s;
+    }
+    .fade-enter-from, .fade-leave-to {
+      opacity: 0;
+    }
+  </style>
 </head>
-<body>
-    <div id="app" class="container">
-        <!-- Sidebar Navigation -->
-        <div class="sidebar">
-            <div class="logo-container">
-                <div class="logo-text">Mamografía e Imágenes Diagnósticas</div>
+<body class="bg-gray-50">
+  <div id="app" v-cloak>
+    <!-- Layout principal -->
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar -->
+      <div class="w-64 bg-white shadow-lg hidden md:block">
+        <div class="p-4 flex items-center justify-center border-b border-gray-200">
+          <img :src="logoPlaceholder" alt="DIMA Logo" class="h-10">
+          <h1 class="text-xl font-bold text-primary ml-2">DIMA</h1>
+        </div>
+        <div class="py-4">
+          <nav>
+            <div v-for="(item, index) in menuItems" :key="index">
+              <a href="#" @click.prevent="currentModule = item.module" 
+                 class="block py-3 px-4 hover:bg-gray-100 transition-all text-secondary-dark font-medium"
+                 :class="{'sidebar-active': currentModule === item.module}">
+                <i :class="item.icon + ' mr-3 text-primary'"></i>
+                {{ item.name }}
+              </a>
             </div>
-            <ul class="nav-menu">
-                <li class="nav-item" :class="{ active: currentModule === 'usuarios' }" @click="setCurrentModule('usuarios')">
-                    <span>👤</span> Usuarios
-                </li>
-                <li class="nav-item" :class="{ active: currentModule === 'equipos' }" @click="setCurrentModule('equipos')">
-                    <span>🔬</span> Equipos
-                </li>
-                <li class="nav-item" :class="{ active: currentModule === 'inventario' }" @click="setCurrentModule('inventario')">
-                    <span>📦</span> Inventario
-                </li>
-            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Contenido principal -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+          <div class="flex items-center justify-between p-4">
+            <div class="flex items-center">
+              <button @click="sidebarMobile = !sidebarMobile" class="text-gray-600 mr-4 md:hidden">
+                <i class="fas fa-bars"></i>
+              </button>
+              <h2 class="text-lg font-semibold text-gray-700">{{ getCurrentModuleTitle() }}</h2>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="relative">
+                <button @click="notificationsOpen = !notificationsOpen" class="text-gray-600 hover:text-primary">
+                  <i class="fas fa-bell"></i>
+                  <span class="absolute top-0 right-0 bg-red-500 rounded-full w-2 h-2"></span>
+                </button>
+                <div v-if="notificationsOpen" class="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-md z-50 border border-gray-200">
+                  <div class="p-3 border-b border-gray-200">
+                    <h3 class="font-medium">Notificaciones</h3>
+                  </div>
+                  <div class="p-3">
+                    <p class="text-sm text-gray-600">5 nuevos informes pendientes de revisión</p>
+                    <p class="text-sm text-gray-600 mt-2">2 citas canceladas requieren reprogramación</p>
+                  </div>
+                </div>
+              </div>
+              <div class="relative">
+                <button @click="userMenuOpen = !userMenuOpen" class="flex items-center text-gray-700">
+                  <span class="mr-2">Dr. Alejandro Sanz</span>
+                  <img src="/api/placeholder/40/40" alt="Usuario" class="h-8 w-8 rounded-full">
+                </button>
+                <div v-if="userMenuOpen" class="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-50 border border-gray-200">
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Perfil</a>
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configuración</a>
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Mobile sidebar -->
+        <div v-if="sidebarMobile" class="fixed inset-0 z-40 md:hidden">
+          <div class="fixed inset-0 bg-black bg-opacity-50" @click="sidebarMobile = false"></div>
+          <div class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-50">
+            <div class="p-4 flex items-center justify-between border-b border-gray-200">
+              <div class="flex items-center">
+                <img :src="logoPlaceholder" alt="DIMA Logo" class="h-8">
+                <h1 class="text-xl font-bold text-primary ml-2">DIMA</h1>
+              </div>
+              <button @click="sidebarMobile = false" class="text-gray-500">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="py-4">
+              <nav>
+                <div v-for="(item, index) in menuItems" :key="index">
+                  <a href="#" @click.prevent="currentModule = item.module; sidebarMobile = false" 
+                     class="block py-3 px-4 hover:bg-gray-100 transition-all text-secondary-dark font-medium"
+                     :class="{'sidebar-active': currentModule === item.module}">
+                    <i :class="item.icon + ' mr-3 text-primary'"></i>
+                    {{ item.name }}
+                  </a>
+                </div>
+              </nav>
+            </div>
+          </div>
         </div>
 
-        <!-- Main Content Area -->
-        <div class="main-content">
-            <!-- Usuarios Module -->
-            <div v-if="currentModule === 'usuarios'">
-                <div class="header">
-                    <h1 class="page-title">Gestión de Usuarios</h1>
-                    <div class="actions">
-                        <button class="btn btn-primary" @click="openModal('usuarios')">Agregar Usuario</button>
-                    </div>
+        <!-- Contenido del módulo -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4">
+          <!-- Dashboard -->
+          <div v-if="currentModule === 'dashboard'" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                  <div class="rounded-full bg-blue-100 p-3">
+                    <i class="fas fa-calendar-check text-primary text-xl"></i>
+                  </div>
+                  <div class="ml-4">
+                    <h3 class="text-gray-500 text-sm">Citas hoy</h3>
+                    <p class="text-2xl font-bold">48</p>
+                  </div>
                 </div>
-                
-                <div class="card">
-                    <div class="card-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre</th>
-                                    <th>Correo</th>
-                                    <th>Rol</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="usuario in usuarios" :key="usuario.id">
-                                    <td>{{ usuario.id }}</td>
-                                    <td>{{ usuario.nombre }}</td>
-                                    <td>{{ usuario.correo }}</td>
-                                    <td>{{ usuario.rol }}</td>
-                                    <td>
-                                        <button class="btn btn-secondary btn-icon" @click="editItem('usuarios', usuario)">✏️</button>
-                                        <button class="btn btn-danger btn-icon" @click="deleteItem('usuarios', usuario.id)">🗑️</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+              </div>
+              <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                  <div class="rounded-full bg-green-100 p-3">
+                    <i class="fas fa-user-check text-green-600 text-xl"></i>
+                  </div>
+                  <div class="ml-4">
+                    <h3 class="text-gray-500 text-sm">Pacientes atendidos</h3>
+                    <p class="text-2xl font-bold">32</p>
+                  </div>
                 </div>
+              </div>
+              <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                  <div class="rounded-full bg-yellow-100 p-3">
+                    <i class="fas fa-file-medical-alt text-yellow-600 text-xl"></i>
+                  </div>
+                  <div class="ml-4">
+                    <h3 class="text-gray-500 text-sm">Exámenes pendientes</h3>
+                    <p class="text-2xl font-bold">15</p>
+                  </div>
+                </div>
+              </div>
             </div>
+            
+            <div class="bg-white rounded-lg shadow">
+              <div class="p-4 border-b border-gray-200">
+                <h3 class="font-medium">Productividad Semanal por Sede</h3>
+              </div>
+              <div class="p-4 h-80">
+                <!-- Gráfico simplificado para prototipo -->
+                <div class="flex h-64 items-end space-x-6 pt-4">
+                  <div v-for="(item, index) in productivityData" :key="index" class="flex flex-col items-center flex-1">
+                    <div class="w-full bg-primary-light rounded-t" :style="{ height: item.value + 'px' }"></div>
+                    <div class="text-xs mt-2 text-gray-600">{{ item.label }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-white rounded-lg shadow">
+                <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                  <h3 class="font-medium">Próximas Citas</h3>
+                  <a href="#" @click.prevent="currentModule = 'appointments'" class="text-primary text-sm">Ver todas</a>
+                </div>
+                <div class="p-4">
+                  <div v-for="(appointment, index) in upcomingAppointments" :key="index" class="py-3 border-b border-gray-100 last:border-0">
+                    <div class="flex justify-between">
+                      <div>
+                        <p class="font-medium">{{ appointment.patient }}</p>
+                        <p class="text-sm text-gray-600">{{ appointment.service }}</p>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-sm">{{ appointment.time }}</p>
+                        <p class="text-xs" :class="getStatusClass(appointment.status)">{{ appointment.status }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-white rounded-lg shadow">
+                <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                  <h3 class="font-medium">Informes Pendientes</h3>
+                  <a href="#" @click.prevent="currentModule = 'reports'" class="text-primary text-sm">Ver todos</a>
+                </div>
+                <div class="p-4">
+                  <div v-for="(report, index) in pendingReports" :key="index" class="py-3 border-b border-gray-100 last:border-0">
+                    <div class="flex justify-between">
+                      <div>
+                        <p class="font-medium">{{ report.patient }}</p>
+                        <p class="text-sm text-gray-600">{{ report.exam }}</p>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-sm">{{ report.date }}</p>
+                        <p class="text-xs" :class="getReportStatusClass(report.status)">{{ report.status }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            <!-- Equipos Module -->
-            <div v-if="currentModule === 'equipos'">
-                <div class="header">
-                    <h1 class="page-title">Gestión de Equipos</h1>
-                    <div class="actions">
-                        <button class="btn btn-primary" @click="openModal('equipos')">Agregar Equipo</button>
-                    </div>
+          <!-- Gestión de Pacientes -->
+          <div v-if="currentModule === 'patients'" class="space-y-6">
+            <div class="bg-white rounded-lg shadow">
+              <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="font-medium">Pacientes</h3>
+                <button @click="showPatientModal = true" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
+                  <i class="fas fa-plus mr-2"></i>Nuevo Paciente
+                </button>
+              </div>
+              <div class="p-4 flex flex-wrap gap-4">
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                  <input type="text" v-model="filters.name" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
                 </div>
-                
-                <div class="card">
-                    <div class="card-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre</th>
-                                    <th>Modelo</th>
-                                    <th>Fabricante</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="equipo in equipos" :key="equipo.id">
-                                    <td>{{ equipo.id }}</td>
-                                    <td>{{ equipo.nombre }}</td>
-                                    <td>{{ equipo.modelo }}</td>
-                                    <td>{{ equipo.fabricante }}</td>
-                                    <td>{{ equipo.estado }}</td>
-                                    <td>
-                                        <button class="btn btn-secondary btn-icon" @click="editItem('equipos', equipo)">✏️</button>
-                                        <button class="btn btn-danger btn-icon" @click="deleteItem('equipos', equipo.id)">🗑️</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Documento</label>
+                  <input type="text" v-model="filters.document" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
                 </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                  <select v-model="filters.status" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="">Todos</option>
+                    <option value="active">Activo</option>
+                    <option value="inactive">Inactivo</option>
+                  </select>
+                </div>
+                <div class="w-full md:w-auto flex items-end">
+                  <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+                    <i class="fas fa-search mr-2"></i>Buscar
+                  </button>
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EPS</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="(patient, index) in patients" :key="index" class="hover:bg-gray-50">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ patient.id }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ patient.name }}</div>
+                        <div class="text-sm text-gray-500">{{ patient.birth }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ patient.documentType }} {{ patient.documentNumber }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ patient.phone }}</div>
+                        <div class="text-sm text-gray-500">{{ patient.email }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ patient.eps }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span :class="getPatientStatusClass(patient.status)">{{ patient.status }}</span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button @click="viewPatientHistory(patient)" class="text-primary hover:text-primary-dark mr-3">
+                          <i class="fas fa-history"></i>
+                        </button>
+                        <button class="text-secondary hover:text-secondary-dark mr-3">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-red-500 hover:text-red-700">
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                <div class="text-sm text-gray-700">
+                  Mostrando <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">45</span> resultados
+                </div>
+                <div class="flex space-x-2">
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">Anterior</button>
+                  <button class="px-3 py-1 bg-primary text-white rounded-md text-sm">1</button>
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">2</button>
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">3</button>
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">Siguiente</button>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <!-- Inventario Module -->
-            <div v-if="currentModule === 'inventario'">
-                <div class="header">
-                    <h1 class="page-title">Gestión de Inventario</h1>
-                    <div class="actions">
-                        <button class="btn btn-primary" @click="openModal('inventario')">Agregar Item</button>
-                    </div>
+          <!-- Gestión de Citas -->
+          <div v-if="currentModule === 'appointments'" class="space-y-6">
+            <div class="bg-white rounded-lg shadow">
+              <div class="p-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <h3 class="font-medium">Calendario de Citas</h3>
+                <div class="flex gap-2">
+                  <button @click="showAppointmentModal = true" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
+                    <i class="fas fa-plus mr-2"></i>Nueva Cita
+                  </button>
+                  <div class="flex">
+                    <button class="px-3 py-2 bg-gray-100 text-gray-700 rounded-l-md hover:bg-gray-200 transition">
+                      <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="px-3 py-2 bg-gray-100 text-gray-700 border-l border-r border-gray-300 hover:bg-gray-200 transition">
+                      Hoy
+                    </button>
+                    <button class="px-3 py-2 bg-gray-100 text-gray-700 rounded-r-md hover:bg-gray-200 transition">
+                      <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </div>
                 </div>
-                
-                <div class="card">
-                    <div class="card-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre</th>
-                                    <th>Categoría</th>
-                                    <th>Cantidad</th>
-                                    <th>Último Ingreso</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="item in inventario" :key="item.id">
-                                    <td>{{ item.id }}</td>
-                                    <td>{{ item.nombre }}</td>
-                                    <td>{{ item.categoria }}</td>
-                                    <td>{{ item.cantidad }}</td>
-                                    <td>{{ item.fecha_ingreso }}</td>
-                                    <td>
-                                        <button class="btn btn-secondary btn-icon" @click="editItem('inventario', item)">✏️</button>
-                                        <button class="btn btn-danger btn-icon" @click="deleteItem('inventario', item.id)">🗑️</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+              </div>
+              <div class="p-4 flex flex-wrap gap-4">
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Sede</label>
+                  <select v-model="appointmentFilters.location" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="">Todas</option>
+                    <option value="sede1">Sede Central</option>
+                    <option value="sede2">Sede Norte</option>
+                  </select>
                 </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                  <input type="date" v-model="appointmentFilters.date" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                  <select v-model="appointmentFilters.status" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="">Todos</option>
+                    <option value="confirmed">Confirmada</option>
+                    <option value="pending">Pendiente</option>
+                    <option value="canceled">Cancelada</option>
+                  </select>
+                </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Paciente</label>
+                  <input type="text" v-model="appointmentFilters.patient" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                </div>
+                <div class="w-full md:w-auto flex items-end">
+                  <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+                    <i class="fas fa-search mr-2"></i>Filtrar
+                  </button>
+                </div>
+              </div>
+              <div class="overflow-x-auto p-4">
+                <div class="border border-gray-200 rounded-lg min-w-max">
+                  <div class="grid grid-cols-8 bg-gray-50 border-b border-gray-200">
+                    <div class="py-2 px-4 font-medium text-gray-700 border-r border-gray-200">Hora</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Lunes</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Martes</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Miércoles</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Jueves</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Viernes</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Sábado</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center">Domingo</div>
+                  </div>
+                  
+                  <div v-for="hour in calendarHours" :key="hour" class="grid grid-cols-8 border-b border-gray-200 last:border-0">
+                    <div class="py-2 px-4 text-sm text-gray-700 border-r border-gray-200">{{ hour }}</div>
+                    <div v-for="day in 7" :key="day" class="py-2 px-2 border-r border-gray-200 last:border-0 min-h-[60px]">
+                      <div v-if="getAppointment(hour, day)" 
+                           :class="getAppointmentCardClass(getAppointment(hour, day))"
+                           class="p-2 rounded text-xs h-full">
+                        <div class="font-medium">{{ getAppointment(hour, day).patient }}</div>
+                        <div>{{ getAppointment(hour, day).service }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <!-- Modal for CRUD operations -->
-            <div class="modal-backdrop" v-if="showModal">
-                <div class="modal">
-                    <div class="modal-header">
-                        <h3>{{ editMode ? 'Editar' : 'Agregar' }} {{ getModuleTitle() }}</h3>
-                        <button class="close" @click="closeModal">×</button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Usuarios Form -->
-                        <form v-if="currentModule === 'usuarios'" @submit.prevent="saveItem">
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="nombre">Nombre Completo</label>
-                                        <input type="text" id="nombre" v-model="formData.nombre" required>
-                                    </div>
-                                </div>
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="correo">Correo Electrónico</label>
-                                        <input type="email" id="correo" v-model="formData.correo" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="rol">Rol</label>
-                                        <select id="rol" v-model="formData.rol" required>
-                                            <option value="Administrador">Administrador</option>
-                                            <option value="Médico">Médico</option>
-                                            <option value="Técnico">Técnico</option>
-                                            <option value="Recepcionista">Recepcionista</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="password">Contraseña</label>
-                                        <input type="password" id="password" v-model="formData.password" :required="!editMode">
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                        
-                        <!-- Equipos Form -->
-                        <form v-if="currentModule === 'equipos'" @submit.prevent="saveItem">
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="nombre">Nombre del Equipo</label>
-                                        <input type="text" id="nombre" v-model="formData.nombre" required>
-                                    </div>
-                                </div>
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="modelo">Modelo</label>
-                                        <input type="text" id="modelo" v-model="formData.modelo" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="fabricante">Fabricante</label>
-                                        <input type="text" id="fabricante" v-model="formData.fabricante" required>
-                                    </div>
-                                </div>
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="estado">Estado</label>
-                                        <select id="estado" v-model="formData.estado" required>
-                                            <option value="Activo">Activo</option>
-                                            <option value="En mantenimiento">En mantenimiento</option>
-                                            <option value="Fuera de servicio">Fuera de servicio</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="descripcion">Descripción</label>
-                                <textarea id="descripcion" v-model="formData.descripcion" rows="3"></textarea>
-                            </div>
-                        </form>
-                        
-                        <!-- Inventario Form -->
-                        <form v-if="currentModule === 'inventario'" @submit.prevent="saveItem">
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="nombre">Nombre del Item</label>
-                                        <input type="text" id="nombre" v-model="formData.nombre" required>
-                                    </div>
-                                </div>
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="categoria">Categoría</label>
-                                        <select id="categoria" v-model="formData.categoria" required>
-                                            <option value="Consumibles">Consumibles</option>
-                                            <option value="Repuestos">Repuestos</option>
-                                            <option value="Medicamentos">Medicamentos</option>
-                                            <option value="Materiales">Materiales</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="cantidad">Cantidad</label>
-                                        <input type="number" id="cantidad" v-model="formData.cantidad" min="0" required>
-                                    </div>
-                                </div>
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="fecha_ingreso">Fecha de Ingreso</label>
-                                        <input type="date" id="fecha_ingreso" v-model="formData.fecha_ingreso" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="observaciones">Observaciones</label>
-                                <textarea id="observaciones" v-model="formData.observaciones" rows="2"></textarea>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" @click="closeModal">Cancelar</button>
-                        <button class="btn btn-primary" @click="saveItem">{{ editMode ? 'Actualizar' : 'Guardar' }}</button>
-                    </div>
+          <!-- Turnos Médicos -->
+          <div v-if="currentModule === 'medical-shifts'" class="space-y-6">
+            <div class="bg-white rounded-lg shadow">
+              <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="font-medium">Turnos Médicos</h3>
+                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
+                  <i class="fas fa-save mr-2"></i>Guardar Cambios
+                </button>
+              </div>
+              <div class="p-4 flex flex-wrap gap-4">
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Sede</label>
+                  <select v-model="shiftFilters.location" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="">Todas</option>
+                    <option value="sede1">Sede Central</option>
+                    <option value="sede2">Sede Norte</option>
+                  </select>
                 </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Especialidad</label>
+                  <select v-model="shiftFilters.specialty" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="">Todas</option>
+                    <option value="radiologia">Radiología</option>
+                    <option value="ecografia">Ecografía</option>
+                    <option value="tomografia">Tomografía</option>
+                  </select>
+                </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Profesional</label>
+                  <select v-model="shiftFilters.professional" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="">Todos</option>
+                    <option value="doctor1">Dr. Alejandro Sanz</option>
+                    <option value="doctor2">Dra. María López</option>
+                    <option value="doctor3">Dr. Carlos Gómez</option>
+                  </select>
+                </div>
+              </div>
+              <div class="overflow-x-auto p-4">
+                <div class="border border-gray-200 rounded-lg min-w-max">
+                  <div class="grid grid-cols-8 bg-gray-50 border-b border-gray-200">
+                    <div class="py-2 px-4 font-medium text-gray-700 border-r border-gray-200">Médico</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Lunes</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Martes</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Miércoles</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Jueves</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Viernes</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center border-r border-gray-200">Sábado</div>
+                    <div class="py-2 px-4 font-medium text-gray-700 text-center">Domingo</div>
+                  </div>
+                  
+                  <div v-for="(doctor, index) in doctors" :key="index" class="grid grid-cols-8 border-b border-gray-200 last:border-0">
+                    <div class="py-2 px-4 text-sm text-gray-700 border-r border-gray-200 font-medium">{{ doctor.name }}</div>
+                    <div v-for="day in 7" :key="day" class="py-2 px-2 border-r border-gray-200 last:border-0 min-h-[60px]">
+                      <div v-if="doctor.shifts && doctor.shifts[day-1]"
+                          :class="{'bg-primary-light text-primary-dark': doctor.shifts[day-1].active}"
+                          class="p-2 rounded text-xs h-full cursor-pointer hover:bg-primary-light transition-colors"
+                          @click="toggleShift(doctor, day-1)">
+                        <div v-if="doctor.shifts[day-1].active">
+                          {{ doctor.shifts[day-1].startTime }} - {{ doctor.shifts[day-1].endTime }}
+                          <div class="mt-1 text-xs">{{ doctor.shifts[day-1].location }}</div>
+                        </div>
+                        <div v-else class="text-center text-gray-400">
+                          <i class="fas fa-plus"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center">
+                  <div class="w-4 h-4 bg-red-100 rounded-full mr-2"></div>
+                  <span class="text-sm text-red-600 mr-6">Conflicto con citas</span>
+                  
+                  <div class="w-4 h-4 bg-primary-light rounded-full mr-2"></div>
+                  <span class="text-sm text-primary-dark">Turno asignado</span>
+                </div>
+              </div>
             </div>
-        </div>
+          </div>
+
+          <!-- Integración PACS - MWL -->
+          <div v-if="currentModule === 'pacs'" class="space-y-6">
+            <div class="bg-white rounded-lg shadow">
+              <div class="p-4 border-b border-gray-200">
+                <h3 class="font-medium">Integración PACS - Modality Worklist</h3>
+              </div>
+              <div class="p-4 flex flex-wrap gap-4">
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                  <input type="date" v-model="pacsFilters.date" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                  <select v-model="pacsFilters.status" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="">Todos</option>
+                    <option value="success">Exitoso</option>
+                    <option value="error">Error</option>
+                    <option value="pending">Pendiente</option>
+                  </select>
+                </div>
+                <div class="w-full md:w-auto flex items-end">
+                  <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+                    <i class="fas fa-search mr-2"></i>Filtrar
+                  </button>
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estudio</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modalidad</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="(pacs, index) in pacsIntegrations" :key="index" class="hover:bg-gray-50">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pacs.id }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ pacs.patient }}</div>
+                        <div class="text-sm text-gray-500">{{ pacs.patientId }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pacs.study }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pacs.date }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pacs.modality }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span :class="getPacsStatusClass(pacs.status)">{{ pacs.status }}</span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button @click="viewPacsLogs(pacs)" class="text-primary hover:text-primary-dark mr-3">
+                          <i class="fas fa-terminal"></i>
+                        </button>
+                        <button class="text-secondary hover:text-secondary-dark mr-3">
+                          <i class="fas fa-sync-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                <div class="text-sm text-gray-700">
+                  Mostrando <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">32</span> resultados
+                </div>
+                <div class="flex space-x-2">
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">Anterior</button>
+                  <button class="px-3 py-1 bg-primary text-white rounded-md text-sm">1</button>
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">2</button>
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">3</button>
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">Siguiente</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow">
+              <div class="p-4 border-b border-gray-200">
+                <h3 class="font-medium">Logs de Integración</h3>
+              </div>
+              <div class="p-4">
+                <div class="bg-gray-800 text-gray-200 rounded-lg p-4 font-mono text-sm h-64 overflow-y-auto">
+                  <div v-for="(log, index) in systemLogs" :key="index" class="mb-2">
+                    <span :class="{'text-green-400': log.type === 'success', 'text-red-400': log.type === 'error', 'text-yellow-400': log.type === 'warning'}">[{{ log.timestamp }}] [{{ log.type.toUpperCase() }}]</span> {{ log.message }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informes Médicos -->
+          <div v-if="currentModule === 'reports'" class="space-y-6">
+            <div class="bg-white rounded-lg shadow">
+              <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="font-medium">Informes Médicos</h3>
+                <button @click="showReportModal = true" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
+                  <i class="fas fa-plus mr-2"></i>Nuevo Informe
+                </button>
+              </div>
+              <div class="p-4 flex flex-wrap gap-4">
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Paciente</label>
+                  <input type="text" v-model="reportFilters.patient" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Estudio</label>
+                  <select v-model="reportFilters.study" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="">Todos</option>
+                    <option value="rx">Radiografía</option>
+                    <option value="eco">Ecografía</option>
+                    <option value="tac">Tomografía</option>
+                  </select>
+                </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Profesional</label>
+                  <select v-model="reportFilters.professional" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="">Todos</option>
+                    <option value="doctor1">Dr. Alejandro Sanz</option>
+                    <option value="doctor2">Dra. María López</option>
+                    <option value="doctor3">Dr. Carlos Gómez</option>
+                  </select>
+                </div>
+                <div class="w-full md:w-auto flex items-end">
+                  <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+                    <i class="fas fa-search mr-2"></i>Filtrar
+                  </button>
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estudio</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profesional</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="(report, index) in medicalReports" :key="index" class="hover:bg-gray-50">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ report.id }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ report.patient }}</div>
+                        <div class="text-sm text-gray-500">{{ report.patientId }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ report.study }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ report.date }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ report.professional }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span :class="getReportStatusClass(report.status)">{{ report.status }}</span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button @click="viewReport(report)" class="text-primary hover:text-primary-dark mr-3">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="text-secondary hover:text-secondary-dark mr-3">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-green-500 hover:text-green-700 mr-3">
+                          <i class="fas fa-signature"></i>
+                        </button>
+                        <button class="text-blue-500 hover:text-blue-700">
+                          <i class="fas fa-download"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                <div class="text-sm text-gray-700">
+                  Mostrando <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">28</span> resultados
+                </div>
+                <div class="flex space-x-2">
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">Anterior</button>
+                  <button class="px-3 py-1 bg-primary text-white rounded-md text-sm">1</button>
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">2</button>
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">3</button>
+                  <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">Siguiente</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reportes RIPS Básicos -->
+          <div v-if="currentModule === 'rips'" class="space-y-6">
+            <div class="bg-white rounded-lg shadow">
+              <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="font-medium">Reportes RIPS</h3>
+                <div>
+                  <button @click="generateRIPS" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
+                    <i class="fas fa-plus mr-2"></i>Generar RIPS
+                  </button>
+                </div>
+              </div>
+              <div class="p-4 flex flex-wrap gap-4">
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Mes</label>
+                  <select v-model="ripsFilters.month" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="1">Enero</option>
+                    <option value="2">Febrero</option>
+                    <option value="3">Marzo</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Mayo</option>
+                    <option value="6">Junio</option>
+                    <option value="7">Julio</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                  </select>
+                </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Año</label>
+                  <select v-model="ripsFilters.year" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                  </select>
+                </div>
+                <div class="w-full md:w-auto">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                  <select v-model="ripsFilters.type" class="px-3 py-2 border border-gray-300 rounded-md w-full md:w-48">
+                    <option value="">Todos</option>
+                    <option value="AC">AC - Consultas</option>
+                    <option value="AP">AP - Procedimientos</option>
+                    <option value="US">US - Usuarios</option>
+                  </select>
+                </div>
+                <div class="w-full md:w-auto flex items-end">
+                  <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+                    <i class="fas fa-search mr-2"></i>Filtrar
+                  </button>
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Periodo</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipos</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registros</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Validación</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="(rips, index) in ripsReports" :key="index" class="hover:bg-gray-50">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ rips.id }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ rips.date }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ rips.period }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex flex-wrap gap-1">
+                          <span v-for="(type, idx) in rips.types" :key="idx" class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                            {{ type }}
+                          </span>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ rips.recordCount }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span :class="getRipsValidationClass(rips.validation)">
+                          {{ rips.validation }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button @click="viewRipsDetails(rips)" class="text-primary hover:text-primary-dark mr-3">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="text-green-500 hover:text-green-700 mr-3">
+                          <i class="fas fa-file-csv"></i>
+                        </button>
+                        <button class="text-blue-500 hover:text-blue-700">
+                          <i class="fas fa-file-download"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                <div class="text-sm text-gray-700">
+                  Mostrando <span class="font-medium">1</span> a <span class="font-medium">5</span> de <span class="font-medium">5</span> resultados
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
-    
-    <script>
-        // Esperar a que Vue esté disponible
-        document.addEventListener('DOMContentLoaded', function() {
-            // Verificar que Vue esté disponible
-            if (typeof Vue === 'undefined') {
-                console.error('Vue no está disponible');
-                return;
-            }
-            
-            const app = Vue.createApp({
-                data() {
-                    return {
-                        currentModule: 'usuarios',
-                        showModal: false,
-                        editMode: false,
-                        formData: {},
-                        selectedItemId: null,
-                        
-                        // Data storage
-                        usuarios: [
-                            { id: 1, nombre: 'Juan Pérez', correo: 'juan.perez@clinica.co', rol: 'Médico' },
-                            { id: 2, nombre: 'Ana Gómez', correo: 'ana.gomez@clinica.co', rol: 'Técnico' },
-                            { id: 3, nombre: 'Carlos Rodriguez', correo: 'carlos.rodriguez@clinica.co', rol: 'Administrador' }
-                        ],
-                        
-                        equipos: [
-                            { id: 1, nombre: 'Mamógrafo Digital', modelo: 'MD-5000', fabricante: 'Medical Solutions', estado: 'Activo', descripcion: 'Equipo de última generación para mamografías digitales.' },
-                            { id: 2, nombre: 'Ecógrafo Portátil', modelo: 'Echo-P200', fabricante: 'SonoTech', estado: 'En mantenimiento', descripcion: 'Equipo portátil para ecografías diagnósticas.' }
-                        ],
-                        
-                        inventario: [
-                            { id: 1, nombre: 'Gel conductor', categoria: 'Consumibles', cantidad: 50, fecha_ingreso: '2025-04-15', observaciones: 'Cajas de 500ml' },
-                            { id: 2, nombre: 'Placas radiográficas', categoria: 'Consumibles', cantidad: 200, fecha_ingreso: '2025-04-10', observaciones: 'Formato 35x43cm' },
-                            { id: 3, nombre: 'Kit de calibración', categoria: 'Repuestos', cantidad: 5, fecha_ingreso: '2025-03-25', observaciones: 'Para mamógrafo MD-5000' }
-                        ]
-                    };
-                },
-                
-                methods: {
-                    setCurrentModule(module) {
-                        this.currentModule = module;
-                    },
-                    
-                    getModuleTitle() {
-                        const titles = {
-                            'usuarios': 'Usuario',
-                            'equipos': 'Equipo',
-                            'inventario': 'Item de Inventario'
-                        };
-                        return titles[this.currentModule];
-                    },
-                    
-                    openModal(module) {
-                        this.currentModule = module;
-                        this.editMode = false;
-                        this.resetForm();
-                        this.showModal = true;
-                    },
-                    
-                    closeModal() {
-                        this.showModal = false;
-                        this.resetForm();
-                    },
-                    
-                    resetForm() {
-                        this.formData = {};
-                        this.selectedItemId = null;
-                        
-                        // Set default values based on the module
-                        if (this.currentModule === 'usuarios') {
-                            this.formData.rol = 'Médico';
-                        } else if (this.currentModule === 'equipos') {
-                            this.formData.estado = 'Activo';
-                        } else if (this.currentModule === 'inventario') {
-                            this.formData.categoria = 'Consumibles';
-                            this.formData.cantidad = 1;
-                            this.formData.fecha_ingreso = new Date().toISOString().split('T')[0];
-                        }
-                    },
-                    
-                    editItem(module, item) {
-                        this.currentModule = module;
-                        this.editMode = true;
-                        this.selectedItemId = item.id;
-                        
-                        // Clone the item to prevent reactive mutation
-                        this.formData = JSON.parse(JSON.stringify(item));
-                        this.showModal = true;
-                    },
-                    
-                    deleteItem(module, id) {
-                        if (!confirm('¿Está seguro de eliminar este elemento?')) return;
-                        
-                        let collection;
-                        if (module === 'usuarios') {
-                            collection = this.usuarios;
-                        } else if (module === 'equipos') {
-                            collection = this.equipos;
-                        } else {
-                            collection = this.inventario;
-                        }
-                        
-                        const index = collection.findIndex(item => item.id === id);
-                        if (index !== -1) {
-                            collection.splice(index, 1);
-                        }
-                    },
-                    
-                    saveItem() {
-                        let collection;
-                        if (this.currentModule === 'usuarios') {
-                            collection = this.usuarios;
-                        } else if (this.currentModule === 'equipos') {
-                            collection = this.equipos;
-                        } else {
-                            collection = this.inventario;
-                        }
-                        
-                        if (this.editMode) {
-                            // Update existing item
-                            const index = collection.findIndex(item => item.id === this.selectedItemId);
-                            if (index !== -1) {
-                                // Preserve the id and update other properties
-                                const id = collection[index].id;
-                                collection[index] = { ...this.formData, id };
-                            }
-                        } else {
-                            // Add new item
-                            const newId = collection.length > 0 ? 
-                                        Math.max(...collection.map(item => item.id)) + 1 : 1;
-                            
-                            collection.push({ id: newId, ...this.formData });
-                        }
-                        
-                        this.closeModal();
-                    }
-                }
-            });
-            
-            // Montar la aplicación
-            app.mount('#app');
+
+    <!-- Modals -->
+    <!-- Modal de Nuevo Paciente -->
+    <div v-if="showPatientModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showPatientModal = false"></div>
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-auto z-10 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Nuevo Paciente</h3>
+            <button @click="showPatientModal = false" class="text-gray-400 hover:text-gray-500">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+                <input type="text" class="px-3 py-2 border border-gray-300 rounded-md w-full">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Documento *</label>
+                  <select class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                    <option value="CC">Cédula</option>
+                    <option value="TI">Tarjeta de Identidad</option>
+                    <option value="CE">Cédula de Extranjería</option>
+                    <option value="PP">Pasaporte</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Número Documento *</label>
+                  <input type="text" class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Celular *</label>
+                <input type="text" class="px-3 py-2 border border-gray-300 rounded-md w-full">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                <input type="email" class="px-3 py-2 border border-gray-300 rounded-md w-full">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Sexo *</label>
+                <select class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                  <option value="O">Otro</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento *</label>
+                <input type="date" class="px-3 py-2 border border-gray-300 rounded-md w-full">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">EPS *</label>
+                <select class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                  <option value="sura">Sura</option>
+                  <option value="coomeva">Coomeva</option>
+                  <option value="nueva_eps">Nueva EPS</option>
+                  <option value="savia">Savia</option>
+                  <option value="sanitas">Sanitas</option>
+                  <option value="particular">Particular</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                <input type="text" class="px-3 py-2 border border-gray-300 rounded-md w-full">
+              </div>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+            <button @click="showPatientModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition mr-2">
+              Cancelar
+            </button>
+            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
+              Guardar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Historial de Paciente -->
+    <div v-if="showHistoryModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showHistoryModal = false"></div>
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-auto z-10 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Historial de {{ selectedPatient.name }}</h3>
+            <button @click="showHistoryModal = false" class="text-gray-400 hover:text-gray-500">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="p-6">
+            <div class="flex mb-6">
+              <button class="px-4 py-2 border-b-2 border-primary text-primary font-medium">Citas</button>
+              <button class="px-4 py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700">Estudios</button>
+              <button class="px-4 py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700">Informes</button>
+            </div>
+            <div>
+              <ul class="space-y-4">
+                <li v-for="(item, index) in patientHistory" :key="index" class="border border-gray-100 rounded-md p-4 hover:bg-gray-50">
+                  <div class="flex items-center justify-between">
+                    <div class="flex">
+                      <div class="rounded-full bg-blue-100 p-2 flex items-center justify-center">
+                        <i class="fas fa-calendar-check text-primary text-sm"></i>
+                      </div>
+                      <div class="ml-4">
+                        <p class="font-medium">{{ item.service }}</p>
+                        <p class="text-sm text-gray-600">{{ item.date }}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <span :class="getStatusClass(item.status)" class="text-xs px-2 py-1 rounded-full">
+                        {{ item.status }}
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+            <button @click="showHistoryModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Nueva Cita -->
+    <div v-if="showAppointmentModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showAppointmentModal = false"></div>
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-auto z-10 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Programar Nueva Cita</h3>
+            <button @click="showAppointmentModal = false" class="text-gray-400 hover:text-gray-500">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="p-6">
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Paciente *</label>
+                <div class="flex space-x-2">
+                  <select class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                    <option value="">Seleccionar paciente...</option>
+                    <option value="1">María Rodríguez</option>
+                    <option value="2">Juan Carlos Pérez</option>
+                    <option value="3">Ana Isabel Díaz</option>
+                  </select>
+                  <button class="px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Sede *</label>
+                <select class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                  <option value="">Seleccionar sede...</option>
+                  <option value="sede1">Sede Central</option>
+                  <option value="sede2">Sede Norte</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Servicio *</label>
+                <select class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                  <option value="">Seleccionar servicio...</option>
+                  <option value="rx">Radiografía</option>
+                  <option value="eco">Ecografía</option>
+                  <option value="tac">Tomografía</option>
+                  <option value="rm">Resonancia Magnética</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Profesional *</label>
+                <select class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                  <option value="">Seleccionar profesional...</option>
+                  <option value="doctor1">Dr. Alejandro Sanz</option>
+                  <option value="doctor2">Dra. María López</option>
+                  <option value="doctor3">Dr. Carlos Gómez</option>
+                </select>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Fecha *</label>
+                  <input type="date" class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Hora *</label>
+                  <select class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                    <option value="">Seleccionar hora...</option>
+                    <option value="0800">08:00 AM</option>
+                    <option value="0830">08:30 AM</option>
+                    <option value="0900">09:00 AM</option>
+                    <option value="0930">09:30 AM</option>
+                    <option value="1000">10:00 AM</option>
+                    <option value="1030">10:30 AM</option>
+                    <option value="1100">11:00 AM</option>
+                    <option value="1130">11:30 AM</option>
+                    <option value="1400">02:00 PM</option>
+                    <option value="1430">02:30 PM</option>
+                    <option value="1500">03:00 PM</option>
+                    <option value="1530">03:30 PM</option>
+                    <option value="1600">04:00 PM</option>
+                    <option value="1630">04:30 PM</option>
+                    <option value="1700">05:00 PM</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                <textarea class="px-3 py-2 border border-gray-300 rounded-md w-full h-24 resize-none"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+            <button @click="showAppointmentModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition mr-2">
+              Cancelar
+            </button>
+            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
+              Programar Cita
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Nuevo Informe -->
+    <div v-if="showReportModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showReportModal = false"></div>
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-auto z-10 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Subir Informe Médico</h3>
+            <button @click="showReportModal = false" class="text-gray-400 hover:text-gray-500">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="p-6">
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Cita *</label>
+                <select class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                  <option value="">Seleccionar cita...</option>
+                  <option value="1">María Rodríguez - Radiografía - 15/05/2025</option>
+                  <option value="2">Juan Carlos Pérez - Ecografía - 16/05/2025</option>
+                  <option value="3">Ana Isabel Díaz - Tomografía - 17/05/2025</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Archivo PDF *</label>
+                <div class="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center">
+                  <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                  <p class="text-sm text-gray-500 mb-1">Arrastra y suelta el archivo aquí o</p>
+                  <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition text-sm">
+                    Seleccionar archivo
+                  </button>
+                  <p class="text-xs text-gray-400 mt-2">PDF (Máx. 10MB)</p>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Notas adicionales</label>
+                <textarea class="px-3 py-2 border border-gray-300 rounded-md w-full h-24 resize-none"></textarea>
+              </div>
+              <div>
+                <label class="flex items-center">
+                  <input type="checkbox" class="form-checkbox h-4 w-4 text-primary">
+                  <span class="ml-2 text-sm text-gray-700">Confirmo que este informe está debidamente firmado</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+            <button @click="showReportModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition mr-2">
+              Cancelar
+            </button>
+            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
+              Subir Informe
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de visualización de logs PACS -->
+    <div v-if="showPacsLogsModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showPacsLogsModal = false"></div>
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-auto z-10 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Logs de Integración PACS</h3>
+            <button @click="showPacsLogsModal = false" class="text-gray-400 hover:text-gray-500">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="p-6">
+            <div class="mb-4">
+              <div class="flex justify-between">
+                <div>
+                  <p class="font-medium">ID: {{ selectedPacs.id }}</p>
+                  <p class="text-sm text-gray-600">{{ selectedPacs.patient }} - {{ selectedPacs.study }}</p>
+                </div>
+                <div>
+                  <span :class="getPacsStatusClass(selectedPacs.status)">{{ selectedPacs.status }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gray-800 text-gray-200 rounded-lg p-4 font-mono text-sm h-64 overflow-y-auto">
+              <div v-for="(log, index) in pacsDetailLogs" :key="index" class="mb-2">
+                <span :class="{'text-green-400': log.type === 'success', 'text-red-400': log.type === 'error', 'text-yellow-400': log.type === 'warning', 'text-blue-400': log.type === 'info'}">[{{ log.timestamp }}] [{{ log.type.toUpperCase() }}]</span> {{ log.message }}
+              </div>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+            <button @click="showPacsLogsModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Generación de RIPS -->
+    <div v-if="showRipsModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showRipsModal = false"></div>
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-auto z-10 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Generar Reportes RIPS</h3>
+            <button @click="showRipsModal = false" class="text-gray-400 hover:text-gray-500">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="p-6">
+            <div class="space-y-6">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Mes *</label>
+                  <select class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                    <option value="1">Enero</option>
+                    <option value="2">Febrero</option>
+                    <option value="3">Marzo</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Mayo</option>
+                    <option value="6">Junio</option>
+                    <option value="7">Julio</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Año *</label>
+                  <select class="px-3 py-2 border border-gray-300 rounded-md w-full">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipos de archivos RIPS *</label>
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary" checked>
+                    <span class="ml-2 text-sm text-gray-700">AC - Consultas</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary" checked>
+                    <span class="ml-2 text-sm text-gray-700">AP - Procedimientos</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary" checked>
+                    <span class="ml-2 text-sm text-gray-700">US - Usuarios</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary">
+                    <span class="ml-2 text-sm text-gray-700">AF - Transacciones</span>
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Formato de salida *</label>
+                <div class="flex space-x-4">
+                  <label class="flex items-center">
+                    <input type="radio" class="form-radio h-4 w-4 text-primary" name="format" checked>
+                    <span class="ml-2 text-sm text-gray-700">CSV</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" class="form-radio h-4 w-4 text-primary" name="format">
+                    <span class="ml-2 text-sm text-gray-700">TXT</span>
+                  </label>
+                </div>
+              </div>
+              <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                      Se detectaron 5 registros con campos incompletos. 
+                      <a href="#" class="font-medium underline">Ver detalle</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+            <button @click="showRipsModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition mr-2">
+              Cancelar
+            </button>
+            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
+              Generar RIPS
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de visualización del informe -->
+    <div v-if="showViewReportModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showViewReportModal = false"></div>
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-auto z-10 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Informe Médico</h3>
+            <button @click="showViewReportModal = false" class="text-gray-400 hover:text-gray-500">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="p-6">
+            <div class="mb-6">
+              <div class="flex justify-between">
+                <div>
+                  <h4 class="font-medium">{{ selectedReport.patient }}</h4>
+                  <p class="text-sm text-gray-600">{{ selectedReport.study }} - {{ selectedReport.date }}</p>
+                </div>
+                <div>
+                  <span :class="getReportStatusClass(selectedReport.status)">{{ selectedReport.status }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gray-100 p-4 h-96 flex items-center justify-center border rounded-lg">
+              <div class="text-center">
+                <i class="fas fa-file-pdf text-red-500 text-5xl mb-4"></i>
+                <p class="text-sm text-gray-600">Vista previa del PDF</p>
+                <button class="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
+                  <i class="fas fa-download mr-2"></i>Descargar Informe
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-200 flex justify-between">
+            <div>
+              <button class="px-4 py-2 border border-green-500 text-green-600 rounded-md hover:bg-green-50 transition">
+                <i class="fas fa-signature mr-2"></i>Firmar Digitalmente
+              </button>
+            </div>
+            <button @click="showViewReportModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, computed } = Vue;
+
+    createApp({
+      setup() {
+        // Estado de la aplicación
+        const currentModule = ref('dashboard');
+        const sidebarMobile = ref(false);
+        const userMenuOpen = ref(false);
+        const notificationsOpen = ref(false);
+
+        // Modales
+        const showPatientModal = ref(false);
+        const showHistoryModal = ref(false);
+        const showAppointmentModal = ref(false);
+        const showReportModal = ref(false);
+        const showPacsLogsModal = ref(false);
+        const showRipsModal = ref(false);
+        const showViewReportModal = ref(false);
+
+        // Elementos seleccionados para modales
+        const selectedPatient = ref({});
+        const selectedPacs = ref({});
+        const selectedReport = ref({});
+
+        // Filtros
+        const filters = ref({
+          name: '',
+          document: '',
+          status: ''
         });
-    </script>
+
+        const appointmentFilters = ref({
+          location: '',
+          date: '',
+          status: '',
+          patient: ''
+        });
+
+        const shiftFilters = ref({
+          location: '',
+          specialty: '',
+          professional: ''
+        });
+
+        const pacsFilters = ref({
+          date: '',
+          status: ''
+        });
+
+        const reportFilters = ref({
+          patient: '',
+          study: '',
+          professional: ''
+        });
+
+        const ripsFilters = ref({
+          month: '5',
+          year: '2025',
+          type: ''
+        });
+
+        // Placeholder para el logo
+        const logoPlaceholder = ref('/api/placeholder/40/40');
+
+        // Ítems del menú
+        const menuItems = ref([
+          { name: 'Panel Principal', module: 'dashboard', icon: 'fas fa-tachometer-alt' },
+          { name: 'Pacientes', module: 'patients', icon: 'fas fa-user-injured' },
+          { name: 'Citas', module: 'appointments', icon: 'fas fa-calendar-alt' },
+          { name: 'Turnos Médicos', module: 'medical-shifts', icon: 'fas fa-user-md' },
+          { name: 'Integración PACS', module: 'pacs', icon: 'fas fa-network-wired' },
+          { name: 'Informes Médicos', module: 'reports', icon: 'fas fa-file-medical-alt' },
+          { name: 'Reportes RIPS', module: 'rips', icon: 'fas fa-chart-bar' }
+        ]);
+
+        // Datos de muestra - Dashboard
+        const productivityData = ref([
+          { label: 'Sede Central', value: 180 },
+          { label: 'Sede Norte', value: 120 },
+          { label: 'Sede Sur', value: 90 },
+          { label: 'Sede Este', value: 150 },
+          { label: 'Sede Oeste', value: 70 }
+        ]);
+
+        const upcomingAppointments = ref([
+          { patient: 'María Rodríguez', service: 'Radiografía', time: '10:30 AM', status: 'Confirmada' },
+          { patient: 'Juan Carlos Pérez', service: 'Ecografía', time: '11:15 AM', status: 'Pendiente' },
+          { patient: 'Ana Isabel Díaz', service: 'Tomografía', time: '12:00 PM', status: 'Confirmada' },
+          { patient: 'Roberto Gómez', service: 'Resonancia', time: '02:30 PM', status: 'Cancelada' }
+        ]);
+
+        const pendingReports = ref([
+          { patient: 'Diana Torres', exam: 'Radiografía Tórax', date: '16/05/2025', status: 'Pendiente' },
+          { patient: 'Carlos Ruiz', exam: 'Ecografía Abdominal', date: '16/05/2025', status: 'En Proceso' },
+          { patient: 'Laura Martínez', exam: 'Tomografía Cerebral', date: '15/05/2025', status: 'Pendiente' }
+        ]);
+
+        // Datos de muestra - Pacientes
+        const patients = ref([
+          { id: 'P001', name: 'María Rodríguez', birth: '15/08/1985', documentType: 'CC', documentNumber: '12345678', phone: '315-123-4567', email: 'maria@ejemplo.com', eps: 'Sura', status: 'Activo' },
+          { id: 'P002', name: 'Juan Carlos Pérez', birth: '22/04/1990', documentType: 'CC', documentNumber: '87654321', phone: '315-765-4321', email: 'juan@ejemplo.com', eps: 'Nueva EPS', status: 'Activo' },
+          { id: 'P003', name: 'Ana Isabel Díaz', birth: '10/12/1978', documentType: 'CE', documentNumber: '98765432', phone: '315-987-6543', email: 'ana@ejemplo.com', eps: 'Sanitas', status: 'Activo' },
+          { id: 'P004', name: 'Roberto Gómez', birth: '05/03/1965', documentType: 'CC', documentNumber: '54321678', phone: '315-543-2167', email: 'roberto@ejemplo.com', eps: 'Savia', status: 'Inactivo' },
+          { id: 'P005', name: 'Diana Torres', birth: '17/06/1992', documentType: 'CC', documentNumber: '67812345', phone: '315-678-1234', email: 'diana@ejemplo.com', eps: 'Coomeva', status: 'Activo' }
+        ]);
+
+        // Historia de paciente seleccionado
+        const patientHistory = ref([
+          { service: 'Radiografía de Tórax', date: '15/04/2025', status: 'Completada' },
+          { service: 'Consulta Radiología', date: '01/03/2025', status: 'Completada' },
+          { service: 'Ecografía Abdominal', date: '15/12/2024', status: 'Completada' },
+          { service: 'Tomografía Cerebral', date: '05/10/2024', status: 'Cancelada' }
+        ]);
+
+        // Datos de calendario
+        const calendarHours = ref([
+          '08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'
+        ]);
+
+        // Datos de muestra - Turnos Médicos
+        const doctors = ref([
+          { 
+            name: 'Dr. Alejandro Sanz', 
+            shifts: [
+              { active: true, startTime: '08:00', endTime: '17:00', location: 'Sede Central' },
+              { active: false },
+              { active: true, startTime: '14:00', endTime: '18:00', location: 'Sede Central' },
+              { active: true, startTime: '08:00', endTime: '12:00', location: 'Sede Norte' },
+              { active: false },
+              { active: false }
+            ]
+          },
+          { 
+            name: 'Dr. Carlos Gómez', 
+            shifts: [
+              { active: true, startTime: '14:00', endTime: '18:00', location: 'Sede Central' },
+              { active: true, startTime: '08:00', endTime: '12:00', location: 'Sede Norte' },
+              { active: true, startTime: '14:00', endTime: '18:00', location: 'Sede Norte' },
+              { active: false },
+              { active: true, startTime: '08:00', endTime: '12:00', location: 'Sede Central' },
+              { active: true, startTime: '08:00', endTime: '12:00', location: 'Sede Norte' },
+              { active: false }
+            ]
+          }
+        ]);
+
+        // Datos de muestra - PACS
+        const pacsIntegrations = ref([
+          { id: 'MWL001', patient: 'María Rodríguez', patientId: 'P001', study: 'Radiografía Tórax', date: '17/05/2025', modality: 'CR', status: 'Exitoso' },
+          { id: 'MWL002', patient: 'Juan Carlos Pérez', patientId: 'P002', study: 'Ecografía Abdominal', date: '17/05/2025', modality: 'US', status: 'Exitoso' },
+          { id: 'MWL003', patient: 'Ana Isabel Díaz', patientId: 'P003', study: 'Tomografía Cerebral', date: '17/05/2025', modality: 'CT', status: 'Pendiente' },
+          { id: 'MWL004', patient: 'Roberto Gómez', patientId: 'P004', study: 'Resonancia Magnética', date: '16/05/2025', modality: 'MR', status: 'Error' },
+          { id: 'MWL005', patient: 'Diana Torres', patientId: 'P005', study: 'Mamografía', date: '16/05/2025', modality: 'MG', status: 'Exitoso' }
+        ]);
+
+        // Logs del sistema
+        const systemLogs = ref([
+          { timestamp: '2025-05-17 09:15:32', type: 'info', message: 'Iniciando generación de MWL para paciente P001' },
+          { timestamp: '2025-05-17 09:15:33', type: 'info', message: 'Verificando información demográfica' },
+          { timestamp: '2025-05-17 09:15:34', type: 'info', message: 'Enviando información a servidor PACS' },
+          { timestamp: '2025-05-17 09:15:35', type: 'success', message: 'MWL generada exitosamente (ID: MWL001)' },
+          { timestamp: '2025-05-17 09:20:12', type: 'info', message: 'Iniciando generación de MWL para paciente P002' },
+          { timestamp: '2025-05-17 09:20:13', type: 'info', message: 'Verificando información demográfica' },
+          { timestamp: '2025-05-17 09:20:14', type: 'warning', message: 'Campo de peso no encontrado, utilizando valor por defecto' },
+          { timestamp: '2025-05-17 09:20:15', type: 'info', message: 'Enviando información a servidor PACS' },
+          { timestamp: '2025-05-17 09:20:16', type: 'success', message: 'MWL generada exitosamente (ID: MWL002)' },
+          { timestamp: '2025-05-17 09:30:22', type: 'info', message: 'Iniciando generación de MWL para paciente P004' },
+          { timestamp: '2025-05-17 09:30:23', type: 'info', message: 'Verificando información demográfica' },
+          { timestamp: '2025-05-17 09:30:24', type: 'error', message: 'Error de conexión con servidor PACS (Timeout)' },
+          { timestamp: '2025-05-17 09:30:25', type: 'error', message: 'No se pudo generar MWL (ID: MWL004)' },
+          { timestamp: '2025-05-17 09:30:26', type: 'info', message: 'Reintentando en 5 minutos' }
+        ]);
+
+        // Logs detallados de PACS seleccionado
+        const pacsDetailLogs = ref([
+          { timestamp: '2025-05-17 09:15:32', type: 'info', message: 'Iniciando generación de MWL para paciente P001' },
+          { timestamp: '2025-05-17 09:15:32', type: 'info', message: 'Cargando datos demográficos desde HIS' },
+          { timestamp: '2025-05-17 09:15:32', type: 'info', message: 'Información demográfica cargada correctamente' },
+          { timestamp: '2025-05-17 09:15:33', type: 'info', message: 'Verificando campos obligatorios' },
+          { timestamp: '2025-05-17 09:15:33', type: 'info', message: 'Todos los campos obligatorios están presentes' },
+          { timestamp: '2025-05-17 09:15:33', type: 'info', message: 'Generando dataset DICOM' },
+          { timestamp: '2025-05-17 09:15:34', type: 'info', message: 'Dataset DICOM generado correctamente' },
+          { timestamp: '2025-05-17 09:15:34', type: 'info', message: 'Enviando información a servidor PACS (IP: 192.168.1.100)' },
+          { timestamp: '2025-05-17 09:15:34', type: 'info', message: 'Conexión establecida con servidor PACS' },
+          { timestamp: '2025-05-17 09:15:35', type: 'info', message: 'Enviando dataset DICOM al servidor PACS' },
+          { timestamp: '2025-05-17 09:15:35', type: 'success', message: 'MWL generada exitosamente (ID: MWL001)' },
+          { timestamp: '2025-05-17 09:15:35', type: 'info', message: 'Cerrando conexión con servidor PACS' },
+          { timestamp: '2025-05-17 09:15:35', type: 'info', message: 'Actualizando estado en base de datos local' },
+          { timestamp: '2025-05-17 09:15:36', type: 'success', message: 'Proceso completado sin errores' }
+        ]);
+
+        // Datos de muestra - Informes Médicos
+        const medicalReports = ref([
+          { id: 'INF001', patient: 'María Rodríguez', patientId: 'P001', study: 'Radiografía Tórax', date: '17/05/2025', professional: 'Dr. Alejandro Sanz', status: 'Validado' },
+          { id: 'INF002', patient: 'Juan Carlos Pérez', patientId: 'P002', study: 'Ecografía Abdominal', date: '17/05/2025', professional: 'Dra. María López', status: 'Pendiente' },
+          { id: 'INF003', patient: 'Ana Isabel Díaz', patientId: 'P003', study: 'Tomografía Cerebral', date: '16/05/2025', professional: 'Dr. Carlos Gómez', status: 'En Proceso' },
+          { id: 'INF004', patient: 'Roberto Gómez', patientId: 'P004', study: 'Resonancia Magnética', date: '15/05/2025', professional: 'Dr. Alejandro Sanz', status: 'Validado' },
+          { id: 'INF005', patient: 'Diana Torres', patientId: 'P005', study: 'Mamografía', date: '15/05/2025', professional: 'Dra. María López', status: 'Pendiente' }
+        ]);
+
+        // Datos de muestra - Reportes RIPS
+        const ripsReports = ref([
+          { 
+            id: 'RIPS001', 
+            date: '01/05/2025', 
+            period: 'Abril 2025', 
+            types: ['AC', 'AP', 'US'], 
+            recordCount: 256, 
+            validation: 'Completo' 
+          },
+          { 
+            id: 'RIPS002', 
+            date: '01/04/2025', 
+            period: 'Marzo 2025', 
+            types: ['AC', 'AP', 'US'], 
+            recordCount: 312, 
+            validation: 'Completo' 
+          },
+          { 
+            id: 'RIPS003', 
+            date: '01/03/2025', 
+            period: 'Febrero 2025', 
+            types: ['AC', 'AP', 'US'], 
+            recordCount: 289, 
+            validation: 'Incompleto' 
+          },
+          { 
+            id: 'RIPS004', 
+            date: '01/02/2025', 
+            period: 'Enero 2025', 
+            types: ['AC', 'AP', 'US'], 
+            recordCount: 274, 
+            validation: 'Completo' 
+          },
+          { 
+            id: 'RIPS005', 
+            date: '01/01/2025', 
+            period: 'Diciembre 2024', 
+            types: ['AC', 'AP', 'US'], 
+            recordCount: 301, 
+            validation: 'Completo' 
+          }
+        ]);
+
+        // Obtener el título del módulo actual
+        const getCurrentModuleTitle = () => {
+          const moduleItem = menuItems.value.find(item => item.module === currentModule.value);
+          return moduleItem ? moduleItem.name : '';
+        };
+
+        // Obtener una cita para el calendario
+        const getAppointment = (hour, day) => {
+          // Simulamos algunas citas para mostrar en el calendario
+          const appointments = [
+            { hour: '08:00', day: 1, patient: 'María Rodríguez', service: 'Radiografía', status: 'confirmed' },
+            { hour: '09:00', day: 1, patient: 'Carlos Ruiz', service: 'Ecografía', status: 'confirmed' },
+            { hour: '10:00', day: 2, patient: 'Ana Díaz', service: 'Tomografía', status: 'pending' },
+            { hour: '11:00', day: 3, patient: 'Roberto Gómez', service: 'Resonancia', status: 'canceled' },
+            { hour: '14:00', day: 4, patient: 'Diana Torres', service: 'Mamografía', status: 'confirmed' },
+            { hour: '15:00', day: 5, patient: 'Luis Sánchez', service: 'Radiografía', status: 'pending' },
+          ];
+          
+          return appointments.find(a => a.hour === hour && a.day === day);
+        };
+
+        // Funciones para manejar los modals
+        const viewPatientHistory = (patient) => {
+          selectedPatient.value = patient;
+          showHistoryModal.value = true;
+        };
+
+        const viewPacsLogs = (pacs) => {
+          selectedPacs.value = pacs;
+          showPacsLogsModal.value = true;
+        };
+
+        const viewReport = (report) => {
+          selectedReport.value = report;
+          showViewReportModal.value = true;
+        };
+
+        const viewRipsDetails = (rips) => {
+          // Aquí se podría implementar la lógica para ver detalles de RIPS
+        };
+
+        const generateRIPS = () => {
+          showRipsModal.value = true;
+        };
+
+        const toggleShift = (doctor, dayIndex) => {
+          const shift = doctor.shifts[dayIndex];
+          shift.active = !shift.active;
+          if (shift.active && !shift.startTime) {
+            shift.startTime = '08:00';
+            shift.endTime = '12:00';
+            shift.location = 'Sede Central';
+          }
+        };
+
+        // Clases condicionales
+        const getStatusClass = (status) => {
+          switch(status.toLowerCase()) {
+            case 'confirmada':
+            case 'completada':
+              return 'bg-green-100 text-green-800 rounded-full px-2 py-1';
+            case 'pendiente':
+              return 'bg-yellow-100 text-yellow-800 rounded-full px-2 py-1';
+            case 'cancelada':
+              return 'bg-red-100 text-red-800 rounded-full px-2 py-1';
+            default:
+              return 'bg-gray-100 text-gray-800 rounded-full px-2 py-1';
+          }
+        };
+
+        const getReportStatusClass = (status) => {
+          switch(status.toLowerCase()) {
+            case 'validado':
+              return 'bg-green-100 text-green-800 rounded-full px-2 py-1';
+            case 'en proceso':
+              return 'bg-blue-100 text-blue-800 rounded-full px-2 py-1';
+            case 'pendiente':
+              return 'bg-yellow-100 text-yellow-800 rounded-full px-2 py-1';
+            default:
+              return 'bg-gray-100 text-gray-800 rounded-full px-2 py-1';
+          }
+        };
+
+        const getPatientStatusClass = (status) => {
+          return status.toLowerCase() === 'activo' 
+            ? 'bg-green-100 text-green-800 rounded-full px-2 py-1 text-xs'
+            : 'bg-red-100 text-red-800 rounded-full px-2 py-1 text-xs';
+        };
+
+        const getPacsStatusClass = (status) => {
+          switch(status.toLowerCase()) {
+            case 'exitoso':
+              return 'bg-green-100 text-green-800 rounded-full px-2 py-1';
+            case 'pendiente':
+              return 'bg-yellow-100 text-yellow-800 rounded-full px-2 py-1';
+            case 'error':
+              return 'bg-red-100 text-red-800 rounded-full px-2 py-1';
+            default:
+              return 'bg-gray-100 text-gray-800 rounded-full px-2 py-1';
+          }
+        };
+
+        const getRipsValidationClass = (validation) => {
+          return validation.toLowerCase() === 'completo' 
+            ? 'bg-green-100 text-green-800 rounded-full px-2 py-1'
+            : 'bg-yellow-100 text-yellow-800 rounded-full px-2 py-1';
+        };
+
+        const getAppointmentCardClass = (appointment) => {
+          switch(appointment.status) {
+            case 'confirmed':
+              return 'bg-green-100 text-green-800';
+            case 'pending':
+              return 'bg-yellow-100 text-yellow-800';
+            case 'canceled':
+              return 'bg-red-100 text-red-800';
+            default:
+              return 'bg-gray-100 text-gray-800';
+          }
+        };
+
+        return {
+          currentModule,
+          sidebarMobile,
+          userMenuOpen,
+          notificationsOpen,
+          showPatientModal,
+          showHistoryModal,
+          showAppointmentModal,
+          showReportModal,
+          showPacsLogsModal,
+          showRipsModal,
+          showViewReportModal,
+          selectedPatient,
+          selectedPacs,
+          selectedReport,
+          filters,
+          appointmentFilters,
+          shiftFilters,
+          pacsFilters,
+          reportFilters,
+          ripsFilters,
+          logoPlaceholder,
+          menuItems,
+          productivityData,
+          upcomingAppointments,
+          pendingReports,
+          patients,
+          patientHistory,
+          calendarHours,
+          doctors,
+          pacsIntegrations,
+          systemLogs,
+          pacsDetailLogs,
+          medicalReports,
+          ripsReports,
+          getCurrentModuleTitle,
+          getAppointment,
+          viewPatientHistory,
+          viewPacsLogs,
+          viewReport,
+          viewRipsDetails,
+          generateRIPS,
+          toggleShift,
+          getStatusClass,
+          getReportStatusClass,
+          getPatientStatusClass,
+          getPacsStatusClass,
+          getRipsValidationClass,
+          getAppointmentCardClass
+        };
+      }
+    }).mount('#app');
+  </script>
 </body>
 </html>
